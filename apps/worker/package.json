@@ -1,0 +1,26 @@
+{
+  "name": "@racehub/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "ingest:schedules": "tsx src/run.ts schedules",
+    "ingest:news": "tsx src/run.ts news"
+  },
+  "dependencies": {
+    "@racehub/db": "*",
+    "drizzle-orm": "^0.38.3",
+    "node-cron": "^3.0.3",
+    "node-ical": "^0.20.1",
+    "postgres": "^3.4.5",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

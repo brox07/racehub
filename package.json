@@ -1,0 +1,20 @@
+{
+  "name": "racehub",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:worker": "npm run dev -w apps/worker",
+    "db:generate": "npm run generate -w @racehub/db",
+    "db:migrate": "npm run migrate -w @racehub/db",
+    "db:seed": "npm run seed -w @racehub/db",
+    "db:studio": "npm run studio -w @racehub/db"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
