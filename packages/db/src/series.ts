@@ -43,6 +43,9 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#e10600",
     websiteUrl: "https://www.formula1.com",
     newsUrl: "https://www.formula1.com/en/latest/all.html",
+    // Community-maintained feed (motorsportcalendars.com). Race only — _gp.
+    // Session-level variants exist, e.g. f1-calendar_p1_p2_p3_qualifying_sprint_gp.ics
+    icsUrl: "https://files-f1.motorsportcalendars.com/f1-calendar_gp.ics",
     sortOrder: 1,
   },
   {
@@ -54,6 +57,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#0090d0",
     websiteUrl: "https://www.fiaformula2.com",
     newsUrl: "https://www.fiaformula2.com/Latest",
+    // Sprint + feature races (motorsportcalendars.com).
+    icsUrl: "https://files-f2.motorsportcalendars.com/f2-calendar_sprint_feature.ics",
     sortOrder: 2,
   },
   {
@@ -65,6 +70,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#e91e63",
     websiteUrl: "https://www.fiaformula3.com",
     newsUrl: "https://www.fiaformula3.com/Latest",
+    // Sprint + feature races (motorsportcalendars.com).
+    icsUrl: "https://files-f3.motorsportcalendars.com/f3-calendar_sprint_feature.ics",
     sortOrder: 3,
   },
   {
@@ -76,6 +83,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#003da5",
     websiteUrl: "https://www.indycar.com",
     newsUrl: "https://www.indycar.com/News",
+    // Race only (motorsportcalendars.com).
+    icsUrl: "https://files-indycar.motorsportcalendars.com/indycar-calendar_race.ics",
     sortOrder: 4,
   },
   {
@@ -97,6 +106,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#00b1eb",
     websiteUrl: "https://www.fiaformulae.com",
     newsUrl: "https://www.fiaformulae.com/en/news",
+    // Race only (motorsportcalendars.com, key "fe").
+    icsUrl: "https://files-fe.motorsportcalendars.com/fe-calendar_race.ics",
     sortOrder: 6,
   },
   {
@@ -164,6 +175,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#1a1a2e",
     websiteUrl: "https://www.fiawec.com",
     newsUrl: "https://www.fiawec.com/en/news",
+    // Community GitHub Pages feed (Bmorganqwe98/racing-2026-calendar), race only.
+    icsUrl: "https://bmorganqwe98.github.io/racing-2026-calendar/wec.ics",
     sortOrder: 20,
   },
   {
@@ -175,6 +188,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#d6001c",
     websiteUrl: "https://www.imsa.com",
     newsUrl: "https://www.imsa.com/news/",
+    // Community GitHub Pages feed (Bmorganqwe98/racing-2026-calendar).
+    icsUrl: "https://bmorganqwe98.github.io/racing-2026-calendar/imsa.ics",
     sortOrder: 21,
   },
   {
@@ -295,6 +310,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#0a1e3c",
     websiteUrl: "https://www.wrc.com",
     newsUrl: "https://www.wrc.com/en/news/",
+    // Community GitHub Pages feed (Bmorganqwe98/racing-2026-calendar). Stage-level events.
+    icsUrl: "https://bmorganqwe98.github.io/racing-2026-calendar/wrc.ics",
     sortOrder: 50,
   },
 ];
