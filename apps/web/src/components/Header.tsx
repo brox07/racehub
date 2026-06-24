@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import { isAdminEmail } from "@/lib/admin";
 
 export async function Header({ siteName }: { siteName: string }) {
   const session = await auth();
+  const showAdmin = isAdminEmail(session?.user?.email);
 
   return (
     <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]/60 backdrop-blur">
@@ -15,6 +17,7 @@ export async function Header({ siteName }: { siteName: string }) {
           <Link href="/" className="hover:text-white">Schedule</Link>
           <Link href="/series" className="hover:text-white">Series</Link>
           <Link href="/news" className="hover:text-white">News</Link>
+          {showAdmin && <Link href="/admin" className="hover:text-white">Admin</Link>}
         </nav>
         <div className="ml-auto flex items-center gap-3 text-sm">
           {session?.user ? (

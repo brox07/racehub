@@ -7,8 +7,10 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../.."),
   // @racehub/db is a workspace TS package consumed directly.
   transpilePackages: ["@racehub/db"],
+  // node-ical is CJS with heavy deps; keep it external to server bundles.
+  serverExternalPackages: ["node-ical"],
   experimental: {
-    serverActions: { bodySizeLimit: "2mb" },
+    serverActions: { bodySizeLimit: "5mb" },
   },
 };
 

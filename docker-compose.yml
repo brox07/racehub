@@ -28,6 +28,7 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       AUTH_SECRET: ${AUTH_SECRET}
       AUTH_TRUST_HOST: "true"
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       NEXT_PUBLIC_SITE_NAME: ${NEXT_PUBLIC_SITE_NAME:-RaceHub}
     ports:
       - "${WEB_PORT:-3000}:3000"
