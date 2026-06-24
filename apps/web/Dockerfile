@@ -21,10 +21,9 @@ RUN npm run build
 FROM node:22-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/packages/db ./packages/db
-COPY --from=build /app/apps/web ./apps/web
-WORKDIR /app/apps/web
+# Standalone output bundles a pruned node_modules + workspace deps; server.js is nested
+# under apps/web because outputFileTracingRoot is the repo root.
+COPY --from=build /app/apps/web/.next/standalone ./
+COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "apps/web/server.js"]
