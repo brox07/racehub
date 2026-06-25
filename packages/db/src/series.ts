@@ -43,9 +43,9 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#e10600",
     websiteUrl: "https://www.formula1.com",
     newsUrl: "https://www.formula1.com/en/latest/all.html",
-    // Community-maintained feed (motorsportcalendars.com). Race only — _gp.
-    // Session-level variants exist, e.g. f1-calendar_p1_p2_p3_qualifying_sprint_gp.ics
-    icsUrl: "https://files-f1.motorsportcalendars.com/f1-calendar_gp.ics",
+    // Community-maintained feed (motorsportcalendars.com). All sessions:
+    // practice, qualifying, sprint, sprint qualifying, and the grand prix.
+    icsUrl: "https://files-f1.motorsportcalendars.com/f1-calendar_p1_p2_p3_qualifying_sprint_gp.ics",
     sortOrder: 1,
   },
   {
@@ -83,8 +83,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#003da5",
     websiteUrl: "https://www.indycar.com",
     newsUrl: "https://www.indycar.com/News",
-    // Race only (motorsportcalendars.com).
-    icsUrl: "https://files-indycar.motorsportcalendars.com/indycar-calendar_race.ics",
+    // Qualifying + race (motorsportcalendars.com).
+    icsUrl: "https://files-indycar.motorsportcalendars.com/indycar-calendar_qualifying_race.ics",
     sortOrder: 4,
   },
   {
@@ -106,8 +106,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#00b1eb",
     websiteUrl: "https://www.fiaformulae.com",
     newsUrl: "https://www.fiaformulae.com/en/news",
-    // Race only (motorsportcalendars.com, key "fe").
-    icsUrl: "https://files-fe.motorsportcalendars.com/fe-calendar_race.ics",
+    // Qualifying + race (motorsportcalendars.com, key "fe").
+    icsUrl: "https://files-fe.motorsportcalendars.com/fe-calendar_qualifying_race.ics",
     sortOrder: 6,
   },
   {

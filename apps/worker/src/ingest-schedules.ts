@@ -1,21 +1,21 @@
 import ical from "node-ical";
-import { db, series, events } from "@racehub/db";
+import { db, series, type RawVEvent, groupIntoWeekends, upsertWeekends } from "@racehub/db";
 import { eq, isNotNull, and } from "drizzle-orm";
-import { slugify } from "./slug.js";
 
 interface IngestStats {
   series: string;
   fetched: number;
-  upserted: number;
+  weekends: number;
+  sessions: number;
   error?: string;
 }
 
 /**
- * Fetch + parse the ICS feed for one series and upsert its events.
- * Idempotent: keyed on (seriesId, sourceUid) so re-runs update in place.
+ * Fetch + parse the ICS feed for one series, group its sessions into race
+ * weekends, and upsert them. Idempotent across re-runs.
  */
 async function ingestSeries(s: { id: number; slug: string; icsUrl: string }): Promise<IngestStats> {
-  const stats: IngestStats = { series: s.slug, fetched: 0, upserted: 0 };
+  const stats: IngestStats = { series: s.slug, fetched: 0, weekends: 0, sessions: 0 };
   try {
     const data = await ical.async.fromURL(s.icsUrl);
     const vevents = Object.values(data).filter(
@@ -23,38 +23,18 @@ async function ingestSeries(s: { id: number; slug: string; icsUrl: string }): Pr
     );
     stats.fetched = vevents.length;
 
-    for (const ev of vevents) {
-      const name = (ev.summary ?? "Untitled").toString().trim();
-      const startsAt = ev.start instanceof Date ? ev.start : new Date(ev.start as unknown as string);
-      if (Number.isNaN(startsAt.getTime())) continue;
-      const endsAt = ev.end instanceof Date ? ev.end : ev.end ? new Date(ev.end as unknown as string) : null;
-      const uid = (ev.uid ?? `${s.slug}-${startsAt.toISOString()}-${name}`).toString();
+    const raw: RawVEvent[] = vevents.map((ev) => ({
+      summary: (ev.summary ?? "Untitled").toString().trim(),
+      start: ev.start instanceof Date ? ev.start : new Date(ev.start as unknown as string),
+      end: ev.end instanceof Date ? ev.end : ev.end ? new Date(ev.end as unknown as string) : null,
+      uid: (ev.uid ?? "").toString(),
+      location: ev.location ? ev.location.toString() : null,
+    }));
 
-      await db
-        .insert(events)
-        .values({
-          seriesId: s.id,
-          slug: slugify(`${name}-${startsAt.getUTCFullYear()}`) || slugify(uid),
-          name,
-          location: ev.location ? ev.location.toString() : null,
-          startsAt,
-          endsAt,
-          sourceUid: uid,
-          sourceUrl: ev.url ? ev.url.toString() : null,
-        })
-        .onConflictDoUpdate({
-          target: [events.seriesId, events.sourceUid],
-          set: {
-            name,
-            location: ev.location ? ev.location.toString() : null,
-            startsAt,
-            endsAt,
-            sourceUrl: ev.url ? ev.url.toString() : null,
-            updatedAt: new Date(),
-          },
-        });
-      stats.upserted++;
-    }
+    const weekends = groupIntoWeekends(raw);
+    const res = await upsertWeekends(s.id, weekends);
+    stats.weekends = res.weekends;
+    stats.sessions = res.sessions;
   } catch (err) {
     stats.error = err instanceof Error ? err.message : String(err);
   }
@@ -80,7 +60,9 @@ export async function ingestSchedules(): Promise<IngestStats[]> {
     if (stat.error) {
       console.error(`[schedules] ${stat.series}: ERROR ${stat.error}`);
     } else {
-      console.log(`[schedules] ${stat.series}: ${stat.upserted}/${stat.fetched} events`);
+      console.log(
+        `[schedules] ${stat.series}: ${stat.weekends} weekends, ${stat.sessions} sessions (${stat.fetched} entries)`,
+      );
     }
   }
   return results;

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { savePreferencesAction } from "@/lib/actions";
 import { CATEGORY_ORDER, categoryLabel } from "@/lib/categories";
+import { SESSION_KIND_FILTERS, sessionKindLabel } from "@/lib/sessions";
 
 export interface FilterSeries {
   id: number;
@@ -31,6 +32,7 @@ export function FilterBar({
 
   const cats = new Set((params.get("cat") ?? "").split(",").filter(Boolean));
   const seriesSlugs = new Set((params.get("series") ?? "").split(",").filter(Boolean));
+  const kinds = new Set((params.get("kinds") ?? "").split(",").filter(Boolean));
   const days = params.get("days") ?? "60";
 
   const categories = useMemo(
@@ -53,12 +55,13 @@ export function FilterBar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function apply(next: { cat?: Set<string>; series?: Set<string>; days?: string }) {
+  function apply(next: { cat?: Set<string>; series?: Set<string>; kinds?: Set<string>; days?: string }) {
     setSaved(false);
     const sp = new URLSearchParams(params.toString());
     const setOrDelete = (key: string, val: string) => (val ? sp.set(key, val) : sp.delete(key));
     setOrDelete("cat", [...(next.cat ?? cats)].join(","));
     setOrDelete("series", [...(next.series ?? seriesSlugs)].join(","));
+    setOrDelete("kinds", [...(next.kinds ?? kinds)].join(","));
     sp.set("days", next.days ?? days);
     startTransition(() => router.replace(`${pathname}?${sp.toString()}`));
   }
@@ -67,6 +70,12 @@ export function FilterBar({
     const n = new Set(cats);
     n.has(c) ? n.delete(c) : n.add(c);
     apply({ cat: n });
+  }
+
+  function toggleKind(k: string) {
+    const n = new Set(kinds);
+    n.has(k) ? n.delete(k) : n.add(k);
+    apply({ kinds: n });
   }
 
   function toggleSeries(slug: string) {
@@ -87,7 +96,7 @@ export function FilterBar({
         : null;
       await savePreferencesAction({
         followedSeriesIds: followedIds,
-        filters: { categories: [...cats], days },
+        filters: { categories: [...cats], kinds: [...kinds], days },
       });
     } else {
       const obj: Record<string, string> = {};
@@ -135,6 +144,25 @@ export function FilterBar({
               }`}
             >
               {categoryLabel(c)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-xs text-[var(--color-muted)]">Sessions</h3>
+        <div className="flex flex-wrap gap-1.5">
+          {SESSION_KIND_FILTERS.map((k) => (
+            <button
+              key={k}
+              onClick={() => toggleKind(k)}
+              className={`chip border transition ${
+                kinds.has(k)
+                  ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-white"
+                  : "border-[var(--color-border)] text-[var(--color-muted)] hover:text-white"
+              }`}
+            >
+              {sessionKindLabel(k)}
             </button>
           ))}
         </div>

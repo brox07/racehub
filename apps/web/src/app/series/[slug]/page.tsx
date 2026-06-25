@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSeriesBySlug, getSeriesSchedule, getEventResults } from "@/lib/queries";
-import { formatRange, formatEventTime, countdown } from "@/lib/format";
+import { formatRange, formatDayTime, countdown } from "@/lib/format";
 import { categoryLabel } from "@/lib/categories";
+import { sessionKindColor } from "@/lib/sessions";
+import { SessionKindFilter } from "@/components/SessionKindFilter";
+import type { SessionKind } from "@racehub/db";
 
 export const dynamic = "force-dynamic";
 
@@ -12,12 +15,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: s?.name ?? "Series" };
 }
 
-export default async function SeriesPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function SeriesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { slug } = await params;
+  const sp = await searchParams;
   const series = await getSeriesBySlug(slug);
   if (!series) notFound();
 
-  const { upcoming, past } = await getSeriesSchedule(series.id);
+  const kinds = (Array.isArray(sp.kinds) ? sp.kinds[0] : sp.kinds ?? "")
+    .split(",")
+    .filter(Boolean) as SessionKind[];
+
+  const { upcoming, past } = await getSeriesSchedule(series.id, kinds.length ? kinds : undefined);
   const lastEvent = past[0];
   const lastResults = lastEvent ? await getEventResults(lastEvent.id) : [];
 
@@ -57,27 +71,50 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]">
-            Upcoming
-          </h2>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]">Upcoming</h2>
+            <SessionKindFilter />
+          </div>
           {upcoming.length === 0 ? (
             <div className="card p-6 text-sm text-[var(--color-muted)]">
-              No upcoming events yet. Add a calendar feed for this series or enter events manually.
+              No upcoming events match. Add a calendar feed for this series or enter events manually.
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {upcoming.map((e) => {
                 const start = new Date(e.startsAt);
+                const end = e.endsAt ? new Date(e.endsAt) : null;
+                const now = Date.now();
                 return (
-                  <div key={e.id} className="card flex items-center justify-between gap-3 p-3">
-                    <div className="min-w-0">
-                      <div className="truncate font-medium">{e.name}</div>
-                      <div className="text-xs text-[var(--color-muted)]">
-                        {formatRange(start, e.endsAt ? new Date(e.endsAt) : null)} · {formatEventTime(start)}
-                        {e.location ? ` · ${e.location}` : ""}
+                  <div key={e.id} className="card p-4">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate font-medium">{e.name}</div>
+                        <div className="text-xs text-[var(--color-muted)]">
+                          {formatRange(start, end)}
+                          {e.location ? ` · ${e.location}` : ""}
+                        </div>
                       </div>
+                      <span className="shrink-0 text-xs font-medium text-[var(--color-accent)]">{countdown(start)}</span>
                     </div>
-                    <span className="shrink-0 text-xs font-medium text-[var(--color-accent)]">{countdown(start)}</span>
+                    {e.sessions.length > 0 && (
+                      <ul className="mt-3 flex flex-col gap-1 border-t border-[var(--color-border)] pt-3">
+                        {e.sessions.map((s) => {
+                          const sStart = new Date(s.startsAt);
+                          return (
+                            <li
+                              key={s.id}
+                              className={`flex items-center justify-between gap-3 text-sm ${
+                                sStart.getTime() <= now ? "opacity-50" : ""
+                              }`}
+                            >
+                              <span className={`font-medium ${sessionKindColor(s.kind)}`}>{s.name}</span>
+                              <span className="shrink-0 text-xs text-[var(--color-muted)]">{formatDayTime(sStart)}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </div>
                 );
               })}

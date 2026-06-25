@@ -19,8 +19,9 @@ export default async function HomePage({
   const hasParams = Object.keys(sp).length > 0;
   if (!hasParams && prefs) {
     const next = new URLSearchParams();
-    const f = (prefs.filters ?? {}) as { categories?: string[]; days?: string };
+    const f = (prefs.filters ?? {}) as { categories?: string[]; kinds?: string[]; days?: string };
     if (f.categories?.length) next.set("cat", f.categories.join(","));
+    if (f.kinds?.length) next.set("kinds", f.kinds.join(","));
     if (prefs.followedSeriesIds?.length) {
       const slugs = allSeries.filter((s) => prefs.followedSeriesIds!.includes(s.id)).map((s) => s.slug);
       if (slugs.length) next.set("series", slugs.join(","));
@@ -34,6 +35,7 @@ export default async function HomePage({
 
   const catFilter = csv(sp.cat);
   const seriesFilter = csv(sp.series);
+  const kindFilter = csv(sp.kinds);
   const days = Number(Array.isArray(sp.days) ? sp.days[0] : sp.days) || 60;
   const to = new Date(Date.now() + days * 86400000);
   const seriesIds = seriesFilter.length
@@ -43,6 +45,7 @@ export default async function HomePage({
   const events = await getUpcomingEvents({
     categories: catFilter.length ? catFilter : undefined,
     seriesIds,
+    kinds: kindFilter.length ? (kindFilter as never[]) : undefined,
     to,
     limit: 300,
   });

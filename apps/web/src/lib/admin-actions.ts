@@ -3,14 +3,14 @@
 import ical from "node-ical";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { and, eq } from "drizzle-orm";
-import { db, events } from "@racehub/db";
+import { eq } from "drizzle-orm";
+import { db, events, groupIntoWeekends, upsertWeekends, type RawVEvent } from "@racehub/db";
 import { assertAdmin } from "@/lib/admin";
 import { slugify } from "@/lib/slug";
 import type { ActionResult } from "@/lib/actions";
 
 export type ImportResult =
-  | { ok: true; fetched: number; added: number; updated: number }
+  | { ok: true; entries: number; weekends: number; sessions: number }
   | { ok: false; error: string };
 
 const eventStatuses = ["scheduled", "in-progress", "completed", "cancelled", "postponed"] as const;
@@ -149,49 +149,18 @@ export async function importIcsAction(
   );
   if (vevents.length === 0) return { ok: false, error: "No calendar events (VEVENT) found in the file." };
 
-  let added = 0;
-  let updated = 0;
-  for (const ev of vevents) {
-    const name = (ev.summary ?? "Untitled").toString().trim();
-    const startsAt = ev.start instanceof Date ? ev.start : new Date(ev.start as unknown as string);
-    if (Number.isNaN(startsAt.getTime())) continue;
-    const endsAt = ev.end instanceof Date ? ev.end : ev.end ? new Date(ev.end as unknown as string) : null;
-    const uid = (ev.uid ?? `${seriesId}-${startsAt.toISOString()}-${name}`).toString();
+  // Group sessions into weekends, identical to the worker's ingestion.
+  const raw: RawVEvent[] = vevents.map((ev) => ({
+    summary: (ev.summary ?? "Untitled").toString().trim(),
+    start: ev.start instanceof Date ? ev.start : new Date(ev.start as unknown as string),
+    end: ev.end instanceof Date ? ev.end : ev.end ? new Date(ev.end as unknown as string) : null,
+    uid: (ev.uid ?? "").toString(),
+    location: ev.location ? ev.location.toString() : null,
+  }));
 
-    const existing = await db
-      .select({ id: events.id })
-      .from(events)
-      .where(and(eq(events.seriesId, seriesId), eq(events.sourceUid, uid)))
-      .limit(1);
-
-    await db
-      .insert(events)
-      .values({
-        seriesId,
-        slug: slugify(`${name}-${startsAt.getUTCFullYear()}`) || slugify(uid),
-        name,
-        location: ev.location ? ev.location.toString() : null,
-        startsAt,
-        endsAt,
-        sourceUid: uid,
-        sourceUrl: ev.url ? ev.url.toString() : null,
-      })
-      .onConflictDoUpdate({
-        target: [events.seriesId, events.sourceUid],
-        set: {
-          name,
-          location: ev.location ? ev.location.toString() : null,
-          startsAt,
-          endsAt,
-          sourceUrl: ev.url ? ev.url.toString() : null,
-          updatedAt: new Date(),
-        },
-      });
-
-    if (existing.length > 0) updated++;
-    else added++;
-  }
+  const weekends = groupIntoWeekends(raw);
+  const res = await upsertWeekends(seriesId, weekends);
 
   revalidatePath("/", "layout");
-  return { ok: true, fetched: vevents.length, added, updated };
+  return { ok: true, entries: vevents.length, weekends: res.weekends, sessions: res.sessions };
 }

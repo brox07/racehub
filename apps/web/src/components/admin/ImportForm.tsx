@@ -46,7 +46,8 @@ export function ImportForm({ series }: { series: SeriesOption[] }) {
       {state && !state.ok && <p className="text-sm text-[var(--color-accent)]">{state.error}</p>}
       {state && state.ok && (
         <p className="text-sm text-green-400">
-          Imported {state.fetched} events: {state.added} added, {state.updated} updated.
+          Imported {state.entries} entries into {state.weekends} weekend{state.weekends === 1 ? "" : "s"} (
+          {state.sessions} session{state.sessions === 1 ? "" : "s"}).
         </p>
       )}
 

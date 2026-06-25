@@ -25,6 +25,15 @@ export function formatRange(start: Date, end: Date | null, tz?: string): string 
   return `${s} – ${e}`;
 }
 
+export function formatDayTime(date: Date, tz?: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: tz,
+  }).format(date);
+}
+
 export function countdown(target: Date, now = new Date()): string {
   const ms = target.getTime() - now.getTime();
   if (ms <= 0) return "Live / past";
