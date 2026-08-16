@@ -10,3 +10,5 @@ coverage/
 .turbo/
 drizzle/meta/_journal.json.bak
 .claude/scheduled_tasks.lock
+*.tsbuildinfo
+

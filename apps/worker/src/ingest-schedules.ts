@@ -1,6 +1,7 @@
 import ical from "node-ical";
 import { db, series, type RawVEvent, groupIntoWeekends, upsertWeekends } from "@racehub/db";
 import { eq, isNotNull, and } from "drizzle-orm";
+import { ingestGtwc } from "./ingest-gtwc.js";
 
 interface IngestStats {
   series: string;
@@ -47,23 +48,42 @@ export async function ingestSchedules(): Promise<IngestStats[]> {
     .from(series)
     .where(and(eq(series.active, true), isNotNull(series.icsUrl)));
 
-  if (targets.length === 0) {
-    console.log("[schedules] No series have an icsUrl configured yet — nothing to ingest.");
-    return [];
+  const results: IngestStats[] = [];
+
+  if (targets.length > 0) {
+    console.log(`[schedules] Ingesting ${targets.length} series via ICS…`);
+    for (const t of targets) {
+      const stat = await ingestSeries(t as { id: number; slug: string; icsUrl: string });
+      results.push(stat);
+      if (stat.error) {
+        console.error(`[schedules] ${stat.series}: ERROR ${stat.error}`);
+      } else {
+        console.log(
+          `[schedules] ${stat.series}: ${stat.weekends} weekends, ${stat.sessions} sessions (${stat.fetched} entries)`,
+        );
+      }
+    }
+  } else {
+    console.log("[schedules] No series have an icsUrl configured yet.");
   }
 
-  console.log(`[schedules] Ingesting ${targets.length} series…`);
-  const results: IngestStats[] = [];
-  for (const t of targets) {
-    const stat = await ingestSeries(t as { id: number; slug: string; icsUrl: string });
-    results.push(stat);
-    if (stat.error) {
-      console.error(`[schedules] ${stat.series}: ERROR ${stat.error}`);
-    } else {
-      console.log(
-        `[schedules] ${stat.series}: ${stat.weekends} weekends, ${stat.sessions} sessions (${stat.fetched} entries)`,
-      );
+  // Ingest GTWC calendar using the scraper
+  console.log("[schedules] Ingesting GTWC series via scraper...");
+  try {
+    const gtwcStats = await ingestGtwc();
+    results.push(...gtwcStats);
+    for (const stat of gtwcStats) {
+      if (stat.error) {
+        console.error(`[schedules] ${stat.series}: ERROR ${stat.error}`);
+      } else {
+        console.log(
+          `[schedules] ${stat.series}: ${stat.weekends} weekends, ${stat.sessions} sessions (${stat.fetched} entries)`,
+        );
+      }
     }
+  } catch (err) {
+    console.error("[schedules] GTWC scraper failed:", err);
   }
+
   return results;
 }

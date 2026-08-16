@@ -21,6 +21,7 @@ export interface EventFormValues {
   country?: string | null;
   round?: number | null;
   status?: string;
+  sourceUrl?: string | null;
 }
 
 const STATUSES = ["scheduled", "in-progress", "completed", "cancelled", "postponed"];
@@ -125,6 +126,17 @@ export function EventForm({
             </option>
           ))}
         </select>
+      </label>
+
+      <label className={labelCls}>
+        <span className="text-[var(--color-muted)]">Official URL (optional)</span>
+        <input
+          type="url"
+          name="sourceUrl"
+          defaultValue={values.sourceUrl ?? ""}
+          placeholder="https://…  (overrides the auto race-search link)"
+          className={inputCls}
+        />
       </label>
 
       {state && !state.ok && <p className="text-sm text-[var(--color-accent)]">{state.error}</p>}

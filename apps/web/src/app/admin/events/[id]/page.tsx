@@ -28,6 +28,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
           country: event.country,
           round: event.round,
           status: event.status,
+          sourceUrl: event.sourceUrl,
         }}
       />
     </div>

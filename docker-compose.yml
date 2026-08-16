@@ -16,7 +16,7 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"
 
-  web:
+  racehub:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
@@ -30,6 +30,7 @@ services:
       AUTH_TRUST_HOST: "true"
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       NEXT_PUBLIC_SITE_NAME: ${NEXT_PUBLIC_SITE_NAME:-RaceHub}
+      HOSTNAME: 0.0.0.0
     ports:
       - "${WEB_PORT:-3000}:3000"
 
@@ -47,6 +48,16 @@ services:
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-anthropic/claude-3.5-haiku}
       INGEST_CRON: ${INGEST_CRON:-0 */6 * * *}
       NEWS_CRON: ${NEWS_CRON:-0 * * * *}
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared_racehub
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - racehub
 
 volumes:
   db_data:

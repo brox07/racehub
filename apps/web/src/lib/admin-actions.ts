@@ -33,11 +33,12 @@ function readEventFields(fd: FormData) {
   const country = String(fd.get("country") ?? "").trim() || null;
   const roundRaw = String(fd.get("round") ?? "").trim();
   const round = roundRaw ? Number(roundRaw) : null;
+  const sourceUrl = String(fd.get("sourceUrl") ?? "").trim() || null;
   const statusRaw = String(fd.get("status") ?? "scheduled");
   const status = (eventStatuses as readonly string[]).includes(statusRaw)
     ? (statusRaw as EventStatus)
     : "scheduled";
-  return { name, seriesId, startsAt, endsAt, location, circuit, country, round, status };
+  return { name, seriesId, startsAt, endsAt, location, circuit, country, round, status, sourceUrl };
 }
 
 function validate(f: ReturnType<typeof readEventFields>): string | null {
@@ -68,6 +69,7 @@ export async function createEventAction(
     startsAt: f.startsAt!,
     endsAt: f.endsAt,
     status: f.status,
+    sourceUrl: f.sourceUrl,
   });
 
   revalidatePath("/", "layout");
@@ -97,6 +99,7 @@ export async function updateEventAction(
       startsAt: f.startsAt!,
       endsAt: f.endsAt,
       status: f.status,
+      sourceUrl: f.sourceUrl,
       updatedAt: new Date(),
     })
     .where(eq(events.id, id));

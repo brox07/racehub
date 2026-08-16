@@ -43,6 +43,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#e10600",
     websiteUrl: "https://www.formula1.com",
     newsUrl: "https://www.formula1.com/en/latest/all.html",
+    // Per-series RSS from motorsport.com (~50 items), summarised by the news worker.
+    feedUrl: "https://www.motorsport.com/rss/f1/news/",
     // Community-maintained feed (motorsportcalendars.com). All sessions:
     // practice, qualifying, sprint, sprint qualifying, and the grand prix.
     icsUrl: "https://files-f1.motorsportcalendars.com/f1-calendar_p1_p2_p3_qualifying_sprint_gp.ics",
@@ -57,6 +59,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#0090d0",
     websiteUrl: "https://www.fiaformula2.com",
     newsUrl: "https://www.fiaformula2.com/Latest",
+    feedUrl: "https://www.motorsport.com/rss/f2/news/",
     // Sprint + feature races (motorsportcalendars.com).
     icsUrl: "https://files-f2.motorsportcalendars.com/f2-calendar_sprint_feature.ics",
     sortOrder: 2,
@@ -70,6 +73,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#e91e63",
     websiteUrl: "https://www.fiaformula3.com",
     newsUrl: "https://www.fiaformula3.com/Latest",
+    feedUrl: "https://www.motorsport.com/rss/f3/news/",
     // Sprint + feature races (motorsportcalendars.com).
     icsUrl: "https://files-f3.motorsportcalendars.com/f3-calendar_sprint_feature.ics",
     sortOrder: 3,
@@ -83,6 +87,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#003da5",
     websiteUrl: "https://www.indycar.com",
     newsUrl: "https://www.indycar.com/News",
+    feedUrl: "https://www.motorsport.com/rss/indycar/news/",
     // Qualifying + race (motorsportcalendars.com).
     icsUrl: "https://files-indycar.motorsportcalendars.com/indycar-calendar_qualifying_race.ics",
     sortOrder: 4,
@@ -106,6 +111,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#00b1eb",
     websiteUrl: "https://www.fiaformulae.com",
     newsUrl: "https://www.fiaformulae.com/en/news",
+    feedUrl: "https://www.motorsport.com/rss/formula-e/news/",
     // Qualifying + race (motorsportcalendars.com, key "fe").
     icsUrl: "https://files-fe.motorsportcalendars.com/fe-calendar_qualifying_race.ics",
     sortOrder: 6,
@@ -118,6 +124,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     region: "Japan",
     color: "#e60012",
     websiteUrl: "https://superformula.net/sf3/en",
+    feedUrl: "https://www.motorsport.com/rss/super-formula/news/",
     sortOrder: 7,
   },
 
@@ -131,6 +138,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#ffd100",
     websiteUrl: "https://www.nascar.com",
     newsUrl: "https://www.nascar.com/news-media/",
+    feedUrl: "https://www.motorsport.com/rss/nascar-cup/news/",
     sortOrder: 10,
   },
   {
@@ -151,6 +159,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     region: "North America",
     color: "#ff6a00",
     websiteUrl: "https://www.nascar.com/trucks/",
+    feedUrl: "https://www.motorsport.com/rss/nascar-truck/news/",
     sortOrder: 12,
   },
   {
@@ -162,6 +171,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#00843d",
     websiteUrl: "https://www.supercars.com",
     newsUrl: "https://www.supercars.com/news/",
+    feedUrl: "https://www.motorsport.com/rss/v8supercars/news/",
     sortOrder: 13,
   },
 
@@ -175,6 +185,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#1a1a2e",
     websiteUrl: "https://www.fiawec.com",
     newsUrl: "https://www.fiawec.com/en/news",
+    feedUrl: "https://www.motorsport.com/rss/wec/news/",
     // Community GitHub Pages feed (Bmorganqwe98/racing-2026-calendar), race only.
     icsUrl: "https://bmorganqwe98.github.io/racing-2026-calendar/wec.ics",
     sortOrder: 20,
@@ -188,6 +199,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#d6001c",
     websiteUrl: "https://www.imsa.com",
     newsUrl: "https://www.imsa.com/news/",
+    feedUrl: "https://www.motorsport.com/rss/imsa/news/",
     // Community GitHub Pages feed (Bmorganqwe98/racing-2026-calendar).
     icsUrl: "https://bmorganqwe98.github.io/racing-2026-calendar/imsa.ics",
     sortOrder: 21,
@@ -221,6 +233,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#003087",
     websiteUrl: "https://www.europeanlemansseries.com",
     newsUrl: "https://www.europeanlemansseries.com/en/news",
+    feedUrl: "https://www.motorsport.com/rss/elms/news/",
     sortOrder: 24,
   },
   {
@@ -242,6 +255,52 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#1d1d1b",
     websiteUrl: "https://www.gt-world-challenge.com",
     newsUrl: "https://www.gt-world-challenge.com/news",
+    // motorsport.com "gt" feed covers GT World Challenge coverage.
+    feedUrl: "https://www.motorsport.com/rss/gt/news/",
+    sortOrder: 26,
+  },
+  {
+    slug: "gtwc-america",
+    name: "Fanatec GT World Challenge America",
+    shortName: "GTWC America",
+    category: "gt",
+    region: "North America",
+    color: "#e10600",
+    websiteUrl: "https://www.gt-world-challenge-america.com",
+    parentSlug: "gt-world-challenge",
+    sortOrder: 26,
+  },
+  {
+    slug: "gtwc-europe",
+    name: "Fanatec GT World Challenge Europe",
+    shortName: "GTWC Europe",
+    category: "gt",
+    region: "Europe",
+    color: "#003087",
+    websiteUrl: "https://www.gt-world-challenge-europe.com",
+    parentSlug: "gt-world-challenge",
+    sortOrder: 26,
+  },
+  {
+    slug: "gtwc-asia",
+    name: "Fanatec GT World Challenge Asia",
+    shortName: "GTWC Asia",
+    category: "gt",
+    region: "Asia",
+    color: "#ffd100",
+    websiteUrl: "https://www.gt-world-challenge-asia.com",
+    parentSlug: "gt-world-challenge",
+    sortOrder: 26,
+  },
+  {
+    slug: "gtwc-australia",
+    name: "Fanatec GT World Challenge Australia",
+    shortName: "GTWC Australia",
+    category: "gt",
+    region: "Australia",
+    color: "#00843d",
+    websiteUrl: "https://www.gt-world-challenge-australia.com",
+    parentSlug: "gt-world-challenge",
     sortOrder: 26,
   },
   {
@@ -286,6 +345,8 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#c8102e",
     websiteUrl: "https://www.btcc.net",
     newsUrl: "https://www.btcc.net/news/",
+    // motorsport.com has no BTCC feed; autosport.com covers it.
+    feedUrl: "https://www.autosport.com/rss/btcc/news/",
     sortOrder: 40,
   },
   {
@@ -297,6 +358,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#e2001a",
     websiteUrl: "https://www.dtm.com",
     newsUrl: "https://www.dtm.com/en/news",
+    feedUrl: "https://www.motorsport.com/rss/dtm/news/",
     sortOrder: 41,
   },
 
@@ -310,6 +372,7 @@ export const SERIES_SEED: SeriesSeed[] = [
     color: "#0a1e3c",
     websiteUrl: "https://www.wrc.com",
     newsUrl: "https://www.wrc.com/en/news/",
+    feedUrl: "https://www.motorsport.com/rss/wrc/news/",
     // Community GitHub Pages feed (Bmorganqwe98/racing-2026-calendar). Stage-level events.
     icsUrl: "https://bmorganqwe98.github.io/racing-2026-calendar/wrc.ics",
     sortOrder: 50,

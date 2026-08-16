@@ -25,6 +25,21 @@ export function formatRange(start: Date, end: Date | null, tz?: string): string 
   return `${s} – ${e}`;
 }
 
+/**
+ * Link for "more info" about a race: the curated official URL when set,
+ * otherwise a web search scoped to the series + event + year.
+ */
+export function raceInfoUrl(opts: {
+  sourceUrl?: string | null;
+  seriesName: string;
+  eventName: string;
+  year: number;
+}): string {
+  if (opts.sourceUrl) return opts.sourceUrl;
+  const q = encodeURIComponent(`${opts.seriesName} ${opts.eventName} ${opts.year}`);
+  return `https://www.google.com/search?q=${q}`;
+}
+
 export function formatDayTime(date: Date, tz?: string): string {
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",

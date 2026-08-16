@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSeriesBySlug, getSeriesSchedule, getEventResults } from "@/lib/queries";
-import { formatRange, formatDayTime, countdown } from "@/lib/format";
+import { formatRange, formatDayTime, countdown, raceInfoUrl } from "@/lib/format";
 import { categoryLabel } from "@/lib/categories";
 import { sessionKindColor } from "@/lib/sessions";
 import { SessionKindFilter } from "@/components/SessionKindFilter";
@@ -95,7 +95,22 @@ export default async function SeriesPage({
                           {e.location ? ` · ${e.location}` : ""}
                         </div>
                       </div>
-                      <span className="shrink-0 text-xs font-medium text-[var(--color-accent)]">{countdown(start)}</span>
+                      <div className="flex shrink-0 flex-col items-end gap-1">
+                        <span className="text-xs font-medium text-[var(--color-accent)]">{countdown(start)}</span>
+                        <a
+                          href={raceInfoUrl({
+                            sourceUrl: e.sourceUrl,
+                            seriesName: series.name,
+                            eventName: e.name,
+                            year: start.getUTCFullYear(),
+                          })}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-[var(--color-muted)] hover:text-white"
+                        >
+                          More info ↗
+                        </a>
+                      </div>
                     </div>
                     {e.sessions.length > 0 && (
                       <ul className="mt-3 flex flex-col gap-1 border-t border-[var(--color-border)] pt-3">
